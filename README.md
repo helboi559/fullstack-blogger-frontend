@@ -37,3 +37,35 @@
 - Run npm start in ./ and navigate to "localhost:3000/blogs" and if everything has been set up correctly, you should see the following on page:
   - Blogs Page
     Server Message: hello from express
+
+## Requirements Front (Part 2B)
+* In the fullstackbloggerfrontend (Client) repo:
+  * Modify the useEffect method in the App component to be:
+    * useEffect(() => {
+      const fetchData = async () => {
+        const url = `${urlEndpoint}/blogs/all-blogs`
+        const apiResponse = await fetch(url);
+        const apiJSON = await apiResponse.json();
+        setServerJSON(apiJSON);
+        return;
+      };
+      fetchData();
+    }, []); 
+  * Modify the BlogsPage component to be:
+    * const BlogsPage = (props) => {
+      return (
+        <div className="blogs-page">
+          <h1>Blogs Page</h1>
+          <p>Server Message: {props.message.map((blog)=>{
+            return (
+              <>
+                {blog.title}
+              </>
+            )
+          })}</p>
+        </div>
+      )
+    }
+* Navigate to "localhost:3000/blogs"
+  * It should display the titles of all the blogs in your database to the page.
+* Stretch Goal: Display the other blog fields to the page along with title. Add css to improve the readability of the page.
