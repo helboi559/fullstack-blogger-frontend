@@ -6,10 +6,10 @@ import BlogsPage from "./pages/Blogs"
 const urlEndpoint ="http://localhost:4000";
 function App() {
   const [serverJSON,setServerJSON] = useState({message: [], success: true})
-  const [sortField,setSortField] = useState(null) 
+  const [sortField,setSortField] = useState('title') //'title'
   const [sortOrder,setSortOrder] = useState('ASC')
-  const [filterField,setFilterField] = useState(null)
-  const [filterValue,setFilterValue] = useState(null)
+  const [filterField,setFilterField] = useState('title')//'title'
+  const [filterValue,setFilterValue] = useState('')//''
   const [limit,setLimit] = useState(10)
   const [page,setPage] = useState(0)
   useEffect(() => {

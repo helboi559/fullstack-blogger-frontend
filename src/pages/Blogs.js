@@ -25,6 +25,7 @@ const BlogsPage = (props) => {
   return (
     <>
       <h3>Blogs</h3>
+      <label>Sort Field</label>
       <select value={sortField} onChange={(e) => {
         setSortField(e.target.value)
       }}> {optionsSortF.map((ele)=>{
@@ -33,6 +34,7 @@ const BlogsPage = (props) => {
         )
       })}
       </select>
+      <label>Sort Order</label>
       <select value={sortOrder} onChange={(e) => {
         setSortOrder(e.target.value)
       }}> {optionsSortO.map((ele)=>{
@@ -41,6 +43,7 @@ const BlogsPage = (props) => {
         )
       })}
       </select>
+      <label>Filter Field</label>
       <select value={filterField} onChange={(e) => {
         setFilterField(e.target.value)
       }}> {optionsfilterF.map((ele)=>{
@@ -49,14 +52,17 @@ const BlogsPage = (props) => {
         )
       })}
       </select>
-      <input type="text" value={filterValue} onChange={(e)=> {
+      <label>Filter Value</label>
+      <input placeholder="filter value" type="text" value={filterValue} onChange={(e)=> {
         const value = e.target.value
         setFilterValue(value)
       }}/>
+      <label>Limit</label>
       <input type="number" value={limit} onChange={(e)=> {
         const value = e.target.value
         setLimit(Number(value))
       }}/>
+      <label>Page</label>
       <input type="number" value={page} onChange={(e)=> {
         const value = e.target.value
         setPage(Number(value))
