@@ -106,33 +106,45 @@
 ## Requirements Frontend (Part 2B)
 
 ### Connect Mongo/Express to React
-* In the fullstackbloggerfrontend (Client) repo:
+* In the (Client) repo:
   * Modify the useEffect method in the App component to be:
-    * useEffect(() => {
-      const fetchData = async () => {
-        const url = `${urlEndpoint}/blogs/all-blogs`
-        const apiResponse = await fetch(url);
-        const apiJSON = await apiResponse.json();
-        setServerJSON(apiJSON);
-        return;
-      };
-      fetchData();
-    }, []); 
+    ```js
+    useEffect(() => {
+    const fetchData = async () => {
+      const url = `${urlEndpoint}/blogs/all-blogs`
+      const apiResponse = await fetch(url);
+      const apiJSON = await apiResponse.json();
+      setServerJSON(apiJSON);
+      return;
+    };
+    fetchData();
+    }, []);
+    ```
   * Modify the BlogsPage component to be:
-    * const BlogsPage = (props) => {
+     ```js
+    const BlogsPage = (props) => {
+      const {serverJSON: { message, success },
+      } = props;
       return (
-        <div className="blogs-page">
-          <h1>Blogs Page</h1>
-          <p>Server Message: {props.message.map((blog)=>{
+       <>
+       <p>{!success && message}</p>
+      {!!success && (
+        <ul>
+          {message.map((post, index) => {
+            // console.log(post)
             return (
-              <>
-                {blog.title}
-              </>
-            )
-          })}</p>
-        </div>
+              <li key={`blog-${index + 1}`}>
+                <p>Id#({post.id})- Author({post.author})- Title({post.title})</p>
+                <p>Created At({post.createdAt})</p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      </>
       )
     }
+    ```
 * Navigate to "localhost:3000/blogs"
   * It should display the titles of all the blogs in your database to the page.
 * Stretch Goal: Display the other blog fields to the page along with title. Add css to improve the readability of the page.
@@ -140,7 +152,7 @@
 
 ### Requirements (Fullstack Frontend Part 3A)
 
-## Add Params etc
+## Add Params on frontend
 * Implement the following in the Client
   * Add the following state variables to <App />
     * sortField {string} initialized to null
@@ -150,6 +162,22 @@
     * limit {number} initialized to 10
     * page {number} initialized to 0
   * Pass these state variables as well as their setter functions as props into <BlogsPage />
+  ```js
+  const [serverJSON,setServerJSON] = useState({message: [], success: true})
+  const [sortField,setSortField] = useState('title') //'title'
+  const [sortOrder,setSortOrder] = useState('ASC')
+  const [filterField,setFilterField] = useState('title')//'title'
+  const [filterValue,setFilterValue] = useState('')//''
+  const [limit,setLimit] = useState(10)
+  //set page to instead of zero otherwise you will get BSON error
+  const [page,setPage] = useState(1)
+
+  // Route
+  <Route index element={<BlogsPage sortField={sortField} sortOrder={sortOrder} filterField={filterField} 
+          filterValue={filterValue} limit={limit} page={page} setSortField={setSortField} setSortOrder={setSortOrder} 
+          setFilterField={setFilterField} setFilterValue={setFilterValue} setLimit={setLimit} setPage={setPage} serverJSON={serverJSON} blogSubmit={blogSubmit}/>}/>
+  ```
+ 
   * Add the following input fields to the <BlogsPage />
     * sortField
       * Should be a <select> dropdown with the following <options>, ["title", "author", "createdAt"]
@@ -163,6 +191,64 @@
       * Should be a number input field
     * page 
       * Should be a number input field
+    ```js
+    const optionsSortF = ["title", "author", "createdAt"]
+    const optionsSortO = ["ASC", "DESC"]
+    const optionsfilterF = ["title", "author"]
+    const BlogsPage = (props) => {
+      
+      const {
+        serverJSON: { message, success },
+      } = props;
+      
+      const {sortField,sortOrder,filterField,filterValue,limit,page,setSortField,setSortOrder,
+      setFilterField,setFilterValue,setLimit,setPage} = props;
+      return (
+        <>
+      <h3>Blogs</h3>
+      <label>Sort Field</label>
+      <select value={sortField} onChange={(e) => {
+        setSortField(e.target.value)
+      }}> {optionsSortF.map((ele)=>{
+        return (
+          <option value={ele}>{ele}</option>
+        )
+      })}
+      </select>
+      <label>Sort Order</label>
+      <select value={sortOrder} onChange={(e) => {
+        setSortOrder(e.target.value)
+      }}> {optionsSortO.map((ele)=>{
+        return (
+          <option value={ele}>{ele}</option>
+        )
+      })}
+      </select>
+      <label>Filter Field</label>
+      <select value={filterField} onChange={(e) => {
+        setFilterField(e.target.value)
+      }}> {optionsfilterF.map((ele)=>{
+        return (
+          <option value={ele}>{ele}</option>
+        )
+      })}
+      </select>
+      <label>Filter Value</label>
+      <input placeholder="filter value" type="text" value={filterValue} onChange={(e)=> {
+        const value = e.target.value
+        setFilterValue(value)
+      }}/>
+      <label>Limit</label>
+      <input type="number" value={limit} onChange={(e)=> {
+        const value = e.target.value
+        setLimit(Number(value))
+      }}/>
+      <label>Page</label>
+      <input type="number" value={page} onChange={(e)=> {
+        const value = e.target.value
+        setPage(Number(value))
+      }}/>
+    ```
   * All input fields on the <BlogsPage /> should be hooked up to the state variables in <App />
   * Modify the useEffect method in the <App /> component to be:
     * useEffect(() => {
@@ -176,10 +262,13 @@
       fetchData();
     }, [sortField, sortOrder, filterField, filterValue, limit, page]);
   * Note: The idea here is that the input fields on the <BlogsPage /> will update the state variables in <App />. Since the useEffect hook in <App /> is watching the state variables [sortField, sortOrder, filterField, filterValue, limit, page] for changes, every time the user inputs a new value into any <BlogsPage /> input field, the useEffect will trigger. The new fetch url will be calculated with the most up to date query params and will in turn refetch the new list of blogs from the server.
-## 4B
+## Front end POST request(part 4B)
+
+### Create a new route 
 * Implement the following in the Client
   * Create a new page <PostBlogPage />
   * Create a new route in <App /> "/post-blog" with the element as <PostBlogPage /> 
+### Add POST functionality
   * Add the following function in <App />
     * const blogSubmit = async (blog) => {
         const url = `${urlEndpoint}/blogs/blog-submit`
@@ -194,6 +283,10 @@
       }
   * Modify the "/blogs" route to be the index route of <App /> so that it shows by default at localhost:3000
     * <Route index element={<BlogsPage message={serverJSON.message} blogSubmit={blogSubmit} />} />
+  * pass info as props to PostBlogPage
+    ```js
+    <Route path='/post-blog' element={<PostBlogPage blogSubmit={blogSubmit} />}/>
+    ```
   * Implement the following in <PostBlogPage />
     * Add three new state variables:
       * title {string}
@@ -211,11 +304,58 @@
     * The Submit button should call props.blogSubmit(blogData) onClick and then programatically redirect to the home page.
       * const navigate = useNavigate()
       * navigate(`/`)
-  * Note: blogData is going to be an object containing the current values of title, author, and text in the <PostBlogPage /> state. This data will be received by the server through the POST request, which will then in turn generate a new blog post with the added fields such as createdAt. The server will then save the new post using the mongo insert() method.
+     * Note: blogData is going to be an object containing the current values of title, author, and text in the <PostBlogPage /> state. This data will be received by the server through the POST request, which will then in turn generate a new blog post with the added fields such as createdAt. The server will then save the new post using the mongo insert() method.
+  ```js
+    const PostBlogPage = (props) => {
+      const[title,setTitle] = useState('')
+      const[author,setAuthor] = useState('')
+      const[text,setText] = useState('')
+      const navigate = useNavigate()
+      return (
+      <>
+      <h1>Post Blog Page</h1>
+      <label>Title</label>
+      <input type="text" value={title} onChange={(e)=> {
+          const value = e.target.value
+          setTitle(value)
+      }}/>
+      <label>Author</label>
+      <input type="text" value={author} onChange={(e)=> {
+          const value = e.target.value
+          setAuthor(value)
+      }}/>
+      <label>Text</label>
+      <textarea  value={text} cols="30" rows="10" placeholder='type text here' onChange={(e)=> {
+          const value = e.target.value
+          setText(value)
+      }}></textarea>
+      <button onClick={(e)=> {
+          //no need of other inputs from client as server will add it.
+          const newPost = {
+          
+              title:title,
+              text:text,
+              author:author,
+          }
+          // console.log('newPost',newPost)
+          // console.log('newPost type',typeof newPost)
+          
+          props.blogSubmit(newPost)
+          navigate('/')
+          
 
-* Stretch Goal: Add a debounce in the Front-End to the text input fields
+      }}>Make Post</button>
+      </>
+    )
+  }
+
+  export default PostBlogPage
+  ```
+ 
+
+* Not Done Stretch Goal: Add a debounce in the Front-End to the text input fields
   * https://usehooks.com/useDebounce/
-* Stretch Goal: Modify the mongo method for "all-blogs" so that you can do a text match search in a blog post text field for a specific string. Additionally, update the filter options dropdown on the Front-End to include the "text" option.
+* Not Done Stretch Goal: Modify the mongo method for "all-blogs" so that you can do a text match search in a blog post text field for a specific string. Additionally, update the filter options dropdown on the Front-End to include the "text" option.
   * Note: This will NOT check for partial searches
   * db.articles.find( { $text: { $search: "coffee" } } )
   * https://www.mongodb.com/docs/manual/reference/operator/query/text/#examples

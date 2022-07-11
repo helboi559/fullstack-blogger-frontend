@@ -12,6 +12,7 @@ function App() {
   const [filterField,setFilterField] = useState('title')//'title'
   const [filterValue,setFilterValue] = useState('')//''
   const [limit,setLimit] = useState(10)
+  //set page to instead of zero otherwise you will get BSON error
   const [page,setPage] = useState(1)
   useEffect(() => {
     const fetchData = async () => {

@@ -1,19 +1,10 @@
 import React from "react";
 
 
-// const sortField = ["title", "author", "createdAt"]
-// const sortOrder = ["ASC", "DESC"]
-// const filterField = ["title", "author"]
-// const filterValue = "text"
-// const page = "text"
-// const limit = 1
+
 const optionsSortF = ["title", "author", "createdAt"]
-// const optionsSortF = [{sortField:["title", "author", "createdAt"]}]
 const optionsSortO = ["ASC", "DESC"]
 const optionsfilterF = ["title", "author"]
-// const filterValue = "text"
-// const page = "text"
-// const limit = 1
 const BlogsPage = (props) => {
   
   const {
