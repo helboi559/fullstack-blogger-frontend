@@ -2,6 +2,7 @@ import './App.css';
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import BlogsPage from "./pages/Blogs"
+import PostBlogPage from './pages/PostBlogPage';
 
 const urlEndpoint ="http://localhost:4000";
 function App() {
@@ -11,7 +12,7 @@ function App() {
   const [filterField,setFilterField] = useState('title')//'title'
   const [filterValue,setFilterValue] = useState('')//''
   const [limit,setLimit] = useState(10)
-  const [page,setPage] = useState(0)
+  const [page,setPage] = useState(1)
   useEffect(() => {
     const fetchData = async () => {
       const apiRes = await fetch(`${urlEndpoint}/blogs/all-blogs?sortField=${sortField}&sortOrder=${sortOrder}&filterField=${filterField}&filterValue=${filterValue}&limit=${limit}&page=${page}`)
@@ -22,14 +23,26 @@ function App() {
     }
     fetchData()
   },[sortField, sortOrder, filterField, filterValue, limit, page])
-  console.log(serverJSON)
+  const blogSubmit = async (blog) => {
+    const url = `${urlEndpoint}/blogs/blog-submit`
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(blog) 
+    });
+    const responseJSON = await response.json();
+    }
+  // console.log(serverJSON)
   return (
     <div className="App">
       <header className="App-header">
         <Routes>
-          <Route path='/blogs' element={<BlogsPage sortField={sortField} sortOrder={sortOrder} filterField={filterField} 
+          <Route index element={<BlogsPage sortField={sortField} sortOrder={sortOrder} filterField={filterField} 
           filterValue={filterValue} limit={limit} page={page} setSortField={setSortField} setSortOrder={setSortOrder} 
-          setFilterField={setFilterField} setFilterValue={setFilterValue} setLimit={setLimit} setPage={setPage}serverJSON={serverJSON} />}/>
+          setFilterField={setFilterField} setFilterValue={setFilterValue} setLimit={setLimit} setPage={setPage} serverJSON={serverJSON} blogSubmit={blogSubmit}/>}/>
+          <Route path='/post-blog' element={<PostBlogPage blogSubmit={blogSubmit} />}/>
         </Routes>
       </header>
     </div>
