@@ -362,3 +362,81 @@
 * Super Stretch Goal: 
   * elemMatch may be able to do a partial string match
   * https://www.mongodb.com/docs/manual/reference/operator/query/elemMatch/
+
+## Requirements (Fullstack Part 5B - Blog Post Manager - Client)
+### Create Front-end interface for admin
+* Implement the following Client-Side:
+  * Create a new page <BlogManager />
+  * In <App /> implement the following:
+    * Add a new route "/blog-manager" in <App /> with <BlogManager /> as the element
+      * <Route path="/blog-manager" element={<BlogManager />}>
+    * Create a new state variable adminBlogList and initialize it to an empty array
+    * Create a new state variable adminBlogsLoading and initialize it to false
+    * Create a new useEffect for fetching the admin blog list from "admin/blog-list"
+      * useEffect(() => {
+          const fetchAdminBlogList = async () => {
+            const apiResponse = await fetch(`${urlEndpoint}/admin/blog-list`);
+            const json = await data.json();
+            setAdminBlogList(json);
+            return json;
+          }
+          fetchAdminBlogList()
+        }, [adminBlogsLoading]);
+    * Add the following function for sending the blog DELETE request to backend.
+      * const deleteBlog = async (blogId) => {
+          setAdminBlogsLoading(true)
+          const url = `${urlEndpoint}/admin/delete-blog/${blogId}`
+          const response = await fetch(url, {
+            method: 'DELETE'
+          });
+          const responseJSON = await response.json();
+          setAdminBlogsLoading(false)
+        }
+    * Pass adminBlogList and deleteBlog and as props into <BlogManager />
+  ### Create Modal for blogs.
+  * Create a new component <BlogManagerCard /> in ./src/components and import it into <BlogManager />
+  * In <BlogManager />, map through the props.adminBlogList array and return a <BlogManagerCard /> component for each blog, with the blog variable and props.deleteBlog passed in as a prop to <BlogManagerCard /> :
+    * {props.adminBlogList.map((blog)=>{
+        return (
+          <BlogManagerCard blog={blog} deleteBlog={props.deleteBlog}/> 
+        )
+      })}
+    
+    ```js
+    const BlogManager = (props) => {
+    return (
+      <ul>{props.adminBlogList.map((blog)=> {
+          return (
+              <li>
+                  <BlogManagerCard blog={blog} deleteBlog={props.deleteBlog}/>
+              </li>
+          )
+      })}
+      </ul>
+      )
+    }
+    ```
+  * Implement the following in <BlogManagerCard />:
+    * Display the blog id, title, author, createdAt, and lastModified in the <BlogManagerCard />
+    * Add a button called Delete to the <BlogManagerCard /> which calls props.deleteBlog in the onClick handler with the props.blog.id passed in as the argument
+      * <button onClick={()=>{
+        await props.deleteBlog(props.blog.id)
+      }}>Delete</button>
+    ```js
+    const BlogManagerCard = (props) => {
+        const {blog,deleteBlog} = props
+        return (
+        <>
+        <p>Id: {blog.id}</p>
+        <p>Title: {blog.title}</p>
+        <p>Created At: {blog.createdAt}</p>
+        <p>Last Modified: {blog.lastModified}</p>
+        <button onClick={(e)=> {
+            deleteBlog(Number(blog.id))
+        }}>Delete Blog</button>
+        </>
+      )
+    }
+    ```
+    * Apply css to <BlogManagerCard /> so that each card has a margin between other cards as well as a simple line outline around each card.
+  * Test the delete functionality implemented above to verify everything is hooked up correctly.
