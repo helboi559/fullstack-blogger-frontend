@@ -37,7 +37,7 @@ function App() {
     }
     fetchData()
   },[sortField, sortOrder, filterField, filterValue, limit, page])
-  const blogSubmit = async (blog) => {
+const blogSubmit = async (blog) => {
     const url = `${urlEndpoint}/blogs/blog-submit`
     const response = await fetch(url, {
       method: 'POST',
@@ -47,14 +47,21 @@ function App() {
       body: JSON.stringify(blog) 
     });
     const responseJSON = await response.json();
-    }
-  const deleteBlog = async(blogId) => {
+  }
+const fetchSingleBlog = async (blogId) => {
+    const url = `${urlEndpoint}/blogs/single-blog/${blogId}`
+    const response = await fetch(url);
+    const responseJSON = await response.json();
+    return responseJSON
+  }
+const deleteBlog = async(blogId) => {
     const url = `${urlEndpoint}/admin/delete-blog/${blogId}`
     const response = await fetch(url , {method:'DELETE'})
     const responseJSON = await response.json()
     setAdminBlogsLoading(false)
     
   }
+
   // console.log(serverJSON)
   return (
     <div className="App">
@@ -64,7 +71,7 @@ function App() {
           filterValue={filterValue} limit={limit} page={page} setSortField={setSortField} setSortOrder={setSortOrder} 
           setFilterField={setFilterField} setFilterValue={setFilterValue} setLimit={setLimit} setPage={setPage} serverJSON={serverJSON} blogSubmit={blogSubmit}/>}/>
           <Route path='/post-blog' element={<PostBlogPage blogSubmit={blogSubmit} />}/>
-          <Route path='/blog-manager' element={<BlogManager adminBlogList={adminBlogList} deleteBlog={deleteBlog}/>}/>
+          <Route path='/blog-manager' element={<BlogManager adminBlogList={adminBlogList} deleteBlog={deleteBlog} fetchSingleBlog={fetchSingleBlog} urlEndpoint={urlEndpoint}/>}/>
         </Routes>
       </header>
     </div>

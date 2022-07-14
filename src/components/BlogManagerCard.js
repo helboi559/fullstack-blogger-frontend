@@ -1,7 +1,7 @@
 import React from 'react'
 
 const BlogManagerCard = (props) => {
-    const {blog,deleteBlog} = props
+    const {blog,deleteBlog,fetchBlogAndShow} = props
     return (
     <>
     <p>Id: {blog.id}</p>
@@ -11,6 +11,9 @@ const BlogManagerCard = (props) => {
     <button onClick={(e)=> {
         deleteBlog(Number(blog.id))
     }}>Delete Blog</button>
+    <button onClick={(e)=> {
+      fetchBlogAndShow()
+    }}>Edit</button>
     </>
   )
 }
